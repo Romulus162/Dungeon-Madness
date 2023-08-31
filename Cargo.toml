@@ -1,0 +1,19 @@
+[package]
+name = "dungeon-madness"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+
+# Remember to remove, "dynamic_linking" before release so it can run standalone, otherwise include libbevy_dylib
+[dependencies]
+bevy = { version = "0.11.2", features = ["dynamic_linking"] }
+
+
+[profile.dev]
+opt-level = 1
+
+
+[profile.dev.package."*"]
+opt-level = 3
