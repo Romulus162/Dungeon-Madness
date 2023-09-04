@@ -11,6 +11,8 @@ edition = "2021"
 bevy = { version = "0.11.2", features = ["dynamic_linking"] }
 bevy_rapier2d = "0.22"
 bevy-inspector-egui = "0.19"
+bevy_ecs_ldtk = { version = "0.8", features = ["atlas"] }
+
 
 
 [profile.dev]
