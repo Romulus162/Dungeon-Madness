@@ -12,31 +12,40 @@ use debug::DebugPlugin;
 
 fn main() {
     App::new()
-        .add_plugins(
-            DefaultPlugins.set(ImagePlugin::default_nearest())
-                .set(WindowPlugin {
-                    primary_window: Some(Window {
-                        title: "Dungeon-Madness".into(),
-                        resolution: (640.0, 480.0).into(),
-                        resizable: false,
-                        ..default()
-                    }),
-                    ..default()
-                })
-                .build()
-        )
+        .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()))
+        // .add_plugins(
+        //     DefaultPlugins.set(ImagePlugin::default_nearest())
+        //         .set(WindowPlugin {
+        //             primary_window: Some(Window {
+        //                 title: "Dungeon-Madness".into(),
+        //                 resolution: (640.0, 480.0).into(),
+        //                 resizable: false,
+        //                 ..default()
+        //             }),
+        //             ..default()
+        //         })
+        //         .build()
+        // )
         .add_plugins(LdtkPlugin)
-        .add_plugins(PlayerInput)
-        .add_plugins(DebugPlugin)
-        .add_systems(Startup, setup)
+        // .add_plugins(PlayerInput)
+        // .add_plugins(DebugPlugin)
         .insert_resource(LevelSelection::Uid(0))
+        .add_systems(Startup, setup)
         .run();
 }
 
-pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
-    let camera = Camera2dBundle::default();
-    commands.spawn(camera);
+// pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
+//     let camera = Camera2dBundle::default();
+//     commands.spawn(camera);
 
-    let ldtk_handle = asset_server.load("Typical_2D_platformer_example.ldtk");
-    commands.spawn(LdtkWorldBundle { ldtk_handle, ..Default::default() });
+//     let ldtk_handle = asset_server.load("assets/DevMap.ldtk");
+//     commands.spawn(LdtkWorldBundle { ldtk_handle, ..Default::default() });
+// }
+fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
+    commands.spawn(Camera2dBundle::default());
+
+    commands.spawn(LdtkWorldBundle {
+        ldtk_handle: asset_server.load("Typical_2D_platformer_example.ldtk"),
+        ..Default::default()
+    });
 }
