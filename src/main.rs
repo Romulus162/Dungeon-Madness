@@ -30,17 +30,19 @@ fn main() {
         // .add_plugins(PlayerInput)
         // .add_plugins(DebugPlugin)
         .insert_resource(LevelSelection::Uid(0))
+        .insert_resource(LdtkSettings {
+            level_spawn_behavior: LevelSpawnBehavior::UseWorldTranslation {
+                load_level_neighbors: true,
+            },
+            set_clear_color: SetClearColor::FromLevelBackground,
+            ..Default::default()
+        })
         .add_systems(Startup, setup)
+        .add_systems(Update, systems::camera_fit_inside_current_level)
+        .register_ldtk_entity::<components::PlayerBundle>("Player")
         .run();
 }
 
-// pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
-//     let camera = Camera2dBundle::default();
-//     commands.spawn(camera);
-
-//     let ldtk_handle = asset_server.load("assets/DevMap.ldtk");
-//     commands.spawn(LdtkWorldBundle { ldtk_handle, ..Default::default() });
-// }
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.spawn(Camera2dBundle::default());
 
@@ -48,4 +50,10 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         ldtk_handle: asset_server.load("Typical_2D_platformer_example.ldtk"),
         ..Default::default()
     });
+
+    //NO ATLAS
+    // commands.spawn(LdtkWorldBundle {
+    //     ldtk_handle: asset_server.load("DevMap.ldtk"),
+    //     ..Default::default()
+    // });
 }
