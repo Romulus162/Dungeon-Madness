@@ -7,7 +7,7 @@ mod debug;
 mod components;
 mod systems;
 
-use input::PlayerInput;
+// use input::PlayerInput;
 use debug::DebugPlugin;
 
 fn main() {
