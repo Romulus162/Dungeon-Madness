@@ -1892,7 +1892,7 @@
 							"width": 24,
 							"height": 24,
 							"defUid": 46,
-							"px": [184,208],
+							"px": [184,158],
 							"fieldInstances": [{ "__identifier": "items", "__type": "Array<LocalEnum.Item>", "__value": [ "Knife", "Boots" ], "__tile": null, "defUid": 51, "realEditorValues": [ {
 								"id": "V_String",
 								"params": ["Knife"]

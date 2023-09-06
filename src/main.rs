@@ -28,7 +28,7 @@ fn main() {
         // )
         .add_plugins(LdtkPlugin)
         // .add_plugins(PlayerInput)
-        // .add_plugins(DebugPlugin)
+        .add_plugins(DebugPlugin)
         .insert_resource(LevelSelection::Uid(0))
         .insert_resource(LdtkSettings {
             level_spawn_behavior: LevelSpawnBehavior::UseWorldTranslation {
@@ -38,7 +38,13 @@ fn main() {
             ..Default::default()
         })
         .add_systems(Startup, setup)
+        .add_systems(Update, systems::spawn_wall_collision)
+        // .add_systems(Update, systems::movement)
         .add_systems(Update, systems::camera_fit_inside_current_level)
+        .add_systems(Update, player_movement)
+        // .add_systems(Update, systems::ground_detection)
+        // .add_systems(Update, systems::update_on_ground)
+        .register_ldtk_int_cell::<components::WallBundle>(1)
         .register_ldtk_entity::<components::PlayerBundle>("Player")
         .run();
 }
@@ -56,4 +62,25 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     //     ldtk_handle: asset_server.load("DevMap.ldtk"),
     //     ..Default::default()
     // });
+}
+
+fn player_movement(
+    mut characters: Query<(&mut Transform, &Sprite)>,
+    input: Res<Input<KeyCode>>,
+    time: Res<Time>
+) {
+    for (mut transform, _) in &mut characters {
+        if input.pressed(KeyCode::W) {
+            transform.translation.y += 100.0 * time.delta_seconds();
+        }
+        if input.pressed(KeyCode::S) {
+            transform.translation.y -= 100.0 * time.delta_seconds();
+        }
+        if input.pressed(KeyCode::D) {
+            transform.translation.x += 100.0 * time.delta_seconds();
+        }
+        if input.pressed(KeyCode::A) {
+            transform.translation.x -= 100.0 * time.delta_seconds();
+        }
+    }
 }

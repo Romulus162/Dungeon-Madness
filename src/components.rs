@@ -6,6 +6,27 @@ use bevy_rapier2d::prelude::*;
 #[derive(Copy, Clone, Eq, PartialEq, Debug, Default, Component)]
 pub struct Player;
 
+#[derive(Clone, Default, Bundle, LdtkEntity)]
+pub struct PlayerBundle {
+    #[sprite_bundle("Knight/Colour2/NoOutline/120x80_PNGSheets/_CrouchTransition.png")]
+    pub sprite_bundle: SpriteBundle,
+    #[from_entity_instance]
+    pub collider_bundle: ColliderBundle,
+    pub player: Player,
+    #[worldly]
+    pub worldly: Worldly,
+}
+
+// assets\Knight\Colour2\NoOutline\120x80_PNGSheets\_CrouchTransition.png
+
+#[derive(Copy, Clone, Eq, PartialEq, Debug, Default, Component)]
+pub struct Wall;
+
+#[derive(Clone, Debug, Default, Bundle, LdtkIntCell)]
+pub struct WallBundle {
+    wall: Wall,
+}
+
 #[derive(Clone, Debug, Default, Bundle, LdtkIntCell)]
 pub struct ColliderBundle {
     pub collider: Collider,
@@ -37,12 +58,7 @@ impl From<&EntityInstance> for ColliderBundle {
         }
     }
 }
-
-#[derive(Clone, Default, Bundle, LdtkEntity)]
-pub struct PlayerBundle {
-    #[from_entity_instance]
-    pub collider_bundle: ColliderBundle,
-    pub player: Player,
-    #[worldly]
-    pub worldly: Worldly,
+#[derive(Clone, Default, Component)]
+pub struct GroundDetection {
+    pub on_ground: bool,
 }
