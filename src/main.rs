@@ -10,6 +10,8 @@ mod systems;
 // use input::PlayerInput;
 use debug::DebugPlugin;
 
+//remember movement and stuff
+
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()))
@@ -26,7 +28,7 @@ fn main() {
         //         })
         //         .build()
         // )
-        .add_plugins(LdtkPlugin)
+        .add_plugins((LdtkPlugin, RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0)))
         // .add_plugins(PlayerInput)
         .add_plugins(DebugPlugin)
         .insert_resource(LevelSelection::Uid(0))
@@ -42,7 +44,8 @@ fn main() {
         // .add_systems(Update, systems::movement)
         .add_systems(Update, systems::camera_fit_inside_current_level)
         .add_systems(Update, player_movement)
-        // .add_systems(Update, systems::ground_detection)
+        .add_systems(Update, systems::spawn_ground_sensor)
+        .add_systems(Update, systems::ground_detection)
         // .add_systems(Update, systems::update_on_ground)
         .register_ldtk_int_cell::<components::WallBundle>(1)
         .register_ldtk_entity::<components::PlayerBundle>("Player")
