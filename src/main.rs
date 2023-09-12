@@ -56,7 +56,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.spawn(Camera2dBundle::default());
 
     commands.spawn(LdtkWorldBundle {
-        ldtk_handle: asset_server.load("Typical_2D_platformer_example.ldtk"),
+        ldtk_handle: asset_server.load("Dungeon.ldtk"),
         ..Default::default()
     });
 
@@ -75,9 +75,6 @@ fn player_movement(
     for (mut transform, _) in &mut characters {
         if input.pressed(KeyCode::W) {
             transform.translation.y += 100.0 * time.delta_seconds();
-        }
-        if input.pressed(KeyCode::S) {
-            transform.translation.y -= 100.0 * time.delta_seconds();
         }
         if input.pressed(KeyCode::D) {
             transform.translation.x += 100.0 * time.delta_seconds();

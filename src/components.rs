@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy::utils::HashMap;
 use bevy_ecs_ldtk::{ prelude::*, utils::ldtk_pixel_coords_to_translation_pivoted };
 use std::collections::HashSet;
 use bevy_rapier2d::prelude::*;
@@ -45,7 +46,7 @@ impl From<&EntityInstance> for ColliderBundle {
         match entity_instance.identifier.as_ref() {
             "Player" =>
                 ColliderBundle {
-                    collider: Collider::cuboid(6.0, 14.0),
+                    collider: Collider::cuboid(6.0, 40.0),
                     rigid_body: RigidBody::Dynamic,
                     friction: Friction {
                         coefficient: 0.0,
