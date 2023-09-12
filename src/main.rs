@@ -2,9 +2,11 @@ use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 use bevy_rapier2d::prelude::*;
 
-mod input;
-mod debug;
 mod components;
+mod collisions;
+mod debug;
+mod input;
+mod player;
 mod systems;
 
 // use input::PlayerInput;
@@ -39,48 +41,15 @@ fn main() {
             set_clear_color: SetClearColor::FromLevelBackground,
             ..Default::default()
         })
-        .add_systems(Startup, setup)
-        .add_systems(Update, systems::spawn_wall_collision)
+        .add_systems(Startup, systems::setup)
+        .add_systems(Update, collisions::spawn_wall_collision)
         // .add_systems(Update, systems::movement)
         .add_systems(Update, systems::camera_fit_inside_current_level)
-        .add_systems(Update, player_movement)
-        .add_systems(Update, systems::spawn_ground_sensor)
-        .add_systems(Update, systems::ground_detection)
+        .add_systems(Update, player::player_movement)
+        .add_systems(Update, collisions::spawn_ground_sensor)
+        .add_systems(Update, collisions::ground_detection)
         // .add_systems(Update, systems::update_on_ground)
         .register_ldtk_int_cell::<components::WallBundle>(1)
         .register_ldtk_entity::<components::PlayerBundle>("Player")
         .run();
-}
-
-fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
-    commands.spawn(Camera2dBundle::default());
-
-    commands.spawn(LdtkWorldBundle {
-        ldtk_handle: asset_server.load("Dungeon.ldtk"),
-        ..Default::default()
-    });
-
-    //NO ATLAS
-    // commands.spawn(LdtkWorldBundle {
-    //     ldtk_handle: asset_server.load("DevMap.ldtk"),
-    //     ..Default::default()
-    // });
-}
-
-fn player_movement(
-    mut characters: Query<(&mut Transform, &Sprite)>,
-    input: Res<Input<KeyCode>>,
-    time: Res<Time>
-) {
-    for (mut transform, _) in &mut characters {
-        if input.pressed(KeyCode::W) {
-            transform.translation.y += 100.0 * time.delta_seconds();
-        }
-        if input.pressed(KeyCode::D) {
-            transform.translation.x += 100.0 * time.delta_seconds();
-        }
-        if input.pressed(KeyCode::A) {
-            transform.translation.x -= 100.0 * time.delta_seconds();
-        }
-    }
 }
