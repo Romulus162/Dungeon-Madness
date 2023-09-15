@@ -2,6 +2,7 @@ use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 use bevy_rapier2d::prelude::*;
 
+mod animation;
 mod components;
 mod collisions;
 mod debug;
@@ -11,7 +12,8 @@ mod systems;
 
 // use input::PlayerInput;
 use debug::DebugPlugin;
-
+use animation::AnimationPlugin;
+// use animation::PlayerPlugin;
 //remember movement and stuff
 
 fn main() {
@@ -33,6 +35,9 @@ fn main() {
         .add_plugins((LdtkPlugin, RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0)))
         // .add_plugins(PlayerInput)
         .add_plugins(DebugPlugin)
+        .add_plugins(AnimationPlugin)
+        // .add_plugins(AnimatorPlugin)
+        // .add_plugins(PlayerPlugin)
         .insert_resource(LevelSelection::Uid(0))
         .insert_resource(LdtkSettings {
             level_spawn_behavior: LevelSpawnBehavior::UseWorldTranslation {

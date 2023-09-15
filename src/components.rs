@@ -4,7 +4,7 @@ use bevy_ecs_ldtk::{ prelude::*, utils::ldtk_pixel_coords_to_translation_pivoted
 use std::collections::HashSet;
 use bevy_rapier2d::prelude::*;
 
-#[derive(Copy, Clone, Eq, PartialEq, Debug, Default, Component)]
+#[derive(Clone, Eq, PartialEq, Debug, Default, Component)]
 pub struct Player;
 
 #[derive(Clone, Default, Bundle, LdtkEntity)]
@@ -16,6 +16,7 @@ pub struct PlayerBundle {
     pub player: Player,
     #[worldly]
     pub worldly: Worldly,
+    pub sprite: TextureAtlasSprite,
 }
 
 // assets\Knight\Colour2\NoOutline\120x80_PNGSheets\_CrouchTransition.png
