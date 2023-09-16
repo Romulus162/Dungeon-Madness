@@ -4,22 +4,20 @@ use bevy_ecs_ldtk::{ prelude::*, utils::ldtk_pixel_coords_to_translation_pivoted
 use std::collections::HashSet;
 use bevy_rapier2d::prelude::*;
 
+use crate::animation::PhoxAnimationBundle;
+
 #[derive(Clone, Eq, PartialEq, Debug, Default, Component)]
 pub struct Player;
 
 #[derive(Clone, Default, Bundle, LdtkEntity)]
 pub struct PlayerBundle {
-    #[sprite_bundle("Knight/Colour2/NoOutline/120x80_PNGSheets/_CrouchTransition.png")]
-    pub sprite_bundle: SpriteBundle,
     #[from_entity_instance]
     pub collider_bundle: ColliderBundle,
     pub player: Player,
     #[worldly]
     pub worldly: Worldly,
-    pub sprite: TextureAtlasSprite,
+    pub sprite: SpriteSheetBundle,
 }
-
-// assets\Knight\Colour2\NoOutline\120x80_PNGSheets\_CrouchTransition.png
 
 #[derive(Copy, Clone, Eq, PartialEq, Debug, Default, Component)]
 pub struct Wall;

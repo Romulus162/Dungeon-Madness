@@ -9,7 +9,7 @@ use bevy_rapier2d::prelude::{ Collider, RigidBody };
 use bevy_rapier2d::prelude::*;
 
 pub fn player_movement(
-    mut characters: Query<(&mut Transform, &Sprite)>,
+    mut characters: Query<(&mut Transform, &Player)>,
     input: Res<Input<KeyCode>>,
     time: Res<Time>
 ) {

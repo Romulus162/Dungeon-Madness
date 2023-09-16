@@ -110,7 +110,7 @@ impl FromWorld for AnimationResource {
 struct FrameTime(pub f32);
 
 #[derive(Bundle)]
-struct PhoxAnimationBundle {
+pub struct PhoxAnimationBundle {
     animation: AnimationMeta,
     frame_time: FrameTime,
 }
