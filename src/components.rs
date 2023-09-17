@@ -17,6 +17,7 @@ pub struct PlayerBundle {
     #[worldly]
     pub worldly: Worldly,
     pub sprite: SpriteSheetBundle,
+    pub ground_detection: GroundDetection,
 }
 
 #[derive(Copy, Clone, Eq, PartialEq, Debug, Default, Component)]

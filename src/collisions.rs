@@ -196,3 +196,14 @@ pub fn ground_detection(
         }
     }
 }
+
+pub fn update_on_ground(
+    mut ground_detectors: Query<&mut GroundDetection>,
+    ground_sensors: Query<&GroundSensor, Changed<GroundSensor>>
+) {
+    for sensor in &ground_sensors {
+        if let Ok(mut ground_detection) = ground_detectors.get_mut(sensor.ground_detection_entity) {
+            ground_detection.on_ground = !sensor.intersecting_ground_entities.is_empty();
+        }
+    }
+}

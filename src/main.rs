@@ -6,7 +6,6 @@ mod animation;
 mod components;
 mod collisions;
 mod debug;
-mod input;
 mod player;
 mod systems;
 
@@ -46,6 +45,10 @@ fn main() {
             set_clear_color: SetClearColor::FromLevelBackground,
             ..Default::default()
         })
+        .insert_resource(RapierConfiguration {
+            gravity: Vec2::new(0.0, -2000.0),
+            ..Default::default()
+        })
         .add_systems(Startup, systems::setup)
         .add_systems(Update, collisions::spawn_wall_collision)
         // .add_systems(Update, systems::movement)
@@ -53,7 +56,7 @@ fn main() {
         .add_systems(Update, player::player_movement)
         .add_systems(Update, collisions::spawn_ground_sensor)
         .add_systems(Update, collisions::ground_detection)
-        // .add_systems(Update, systems::update_on_ground)
+        .add_systems(Update, collisions::update_on_ground)
         .register_ldtk_int_cell::<components::WallBundle>(1)
         .register_ldtk_entity::<components::PlayerBundle>("Player")
         .run();

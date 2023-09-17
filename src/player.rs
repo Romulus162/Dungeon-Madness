@@ -9,19 +9,18 @@ use bevy_rapier2d::prelude::{ Collider, RigidBody };
 use bevy_rapier2d::prelude::*;
 
 pub fn player_movement(
-    mut characters: Query<(&mut Transform, &Player)>,
     input: Res<Input<KeyCode>>,
-    time: Res<Time>
+    mut query: Query<(&mut Velocity, &GroundDetection), With<Player>>
 ) {
-    for (mut transform, _) in &mut characters {
-        if input.pressed(KeyCode::W) {
-            transform.translation.y += 100.0 * time.delta_seconds();
-        }
-        if input.pressed(KeyCode::D) {
-            transform.translation.x += 100.0 * time.delta_seconds();
-        }
-        if input.pressed(KeyCode::A) {
-            transform.translation.x -= 100.0 * time.delta_seconds();
+    for (mut velocity, ground_detection) in &mut query {
+        let right = if input.pressed(KeyCode::D) { 1.0 } else { 0.0 };
+
+        let left = if input.pressed(KeyCode::A) { 1.0 } else { 0.0 };
+
+        velocity.linvel.x = (right - left) * 200.0;
+
+        if input.just_pressed(KeyCode::W) && ground_detection.on_ground {
+            velocity.linvel.y = 500.0;
         }
     }
 }
