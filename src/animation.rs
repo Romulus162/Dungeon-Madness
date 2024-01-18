@@ -23,6 +23,9 @@ enum AnimationState {
     Jump,
     Run,
     Fall,
+    Crouch_Transition,
+    Crouch,
+    CrouchWalk,
 }
 
 #[derive(Debug, Clone, Component)]
@@ -71,6 +74,7 @@ impl FromWorld for AnimationResource {
                 None
             );
             res.add(AnimationState::Idle, texture_atlas.add(idle_atlas), AnimationMeta::new(9, 12));
+            //10
 
             let run_atlas = TextureAtlas::from_grid(
                 asset_server.load("Knight/Colour1/Outline/120x80_PNGSheets/_Run.png"),
@@ -100,7 +104,18 @@ impl FromWorld for AnimationResource {
                 None,
                 None
             );
-            res.add(AnimationState::Fall, texture_atlas.add(fall_atlas), AnimationMeta::new(2, 12))
+            res.add(AnimationState::Fall, texture_atlas.add(fall_atlas), AnimationMeta::new(2, 12));
+
+            let crouch_walk_atlas = TextureAtlas::from_grid(
+                asset_server.load("Knight/Colour1/Outline/120x80_PNGSheets/_CrouchWalk.png"),
+                Vec2::new(120.0, 80.0),
+                8,
+                1,
+                None,
+                None
+            );
+            res.add(AnimationState::CrouchWalk, texture_atlas.add(crouch_walk_atlas),AnimationMeta::new(7, 12));
+            //8
         });
         res
     }
@@ -160,6 +175,7 @@ fn append_animation_for_player(
 }
 
 fn change_player_animation(
+    input: Res<Input<KeyCode>>,
     mut player: Query<
         (
             &Player,
@@ -172,6 +188,10 @@ fn change_player_animation(
     >,
     animations: Res<AnimationResource>
 ) {
+    // let mut frame_time = frame_time.single_mut();
+    // let transition_complete = frame_time.0 >= animation.frame_time * (animation.len as f32);
+
+
     if player.is_empty() {
         return;
     }
@@ -182,15 +202,17 @@ fn change_player_animation(
         sprite.flip_x = false;
     }
 
-    let set = if velocity.linvel.y > 0.01 {
-        AnimationState::Jump
+    let mut set = AnimationState::Idle;
+
+    if velocity.linvel.y > 0.01 {
+        set = AnimationState::Jump
     } else if velocity.linvel.y < -0.01 {
-        AnimationState::Fall
+        set =  AnimationState::Fall
     } else if velocity.linvel.x != 0.0 {
-        AnimationState::Run
-    } else {
-        AnimationState::Idle
-    };
+        set = AnimationState::Run
+    } else if input.pressed(KeyCode::S){set = AnimationState::CrouchWalk};
+
+    println!("Current Animation State: {:?}", set);
 
     let Some((new_atlas, new_animation)) = animations.get(set) else {
         error!("No Animation Jump Loaded");
@@ -200,3 +222,6 @@ fn change_player_animation(
     sprite.index %= new_animation.len;
     *animation = new_animation;
 }
+
+
+// "assets/Knight/Colour1/Outline/120x80_PNGSheets/_CrouchTransition.png"
