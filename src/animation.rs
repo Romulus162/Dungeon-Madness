@@ -1,6 +1,8 @@
 use std::collections::HashMap;
+use std::time::Duration;
 
 use bevy::prelude::*;
+use bevy_inspector_egui::egui::Key;
 use bevy_rapier2d::prelude::*;
 
 use crate::components::Player;
@@ -23,7 +25,7 @@ enum AnimationState {
     Jump,
     Run,
     Fall,
-    Crouch_Transition,
+    CrouchTransition,
     Crouch,
     CrouchWalk,
 }
@@ -32,6 +34,7 @@ enum AnimationState {
 struct AnimationMeta {
     len: usize,
     frame_time: f32,
+    crouch_elapsed: f32,
 }
 
 impl AnimationMeta {
@@ -39,6 +42,7 @@ impl AnimationMeta {
         AnimationMeta {
             len: len,
             frame_time: 1.0 / (fps as f32),
+            crouch_elapsed: 0.0,
         }
     }
 }
@@ -106,6 +110,24 @@ impl FromWorld for AnimationResource {
             );
             res.add(AnimationState::Fall, texture_atlas.add(fall_atlas), AnimationMeta::new(2, 12));
 
+            let crouch_transition_atlas = TextureAtlas::from_grid(asset_server.load("Knight/Colour1/Outline/120x80_PNGSheets/_CrouchTransition.png"),
+                Vec2::new(120.0, 80.0),
+                1,
+                1,
+                None,
+                None
+            );
+            res.add(AnimationState::CrouchTransition, texture_atlas.add(crouch_transition_atlas), AnimationMeta::new(1, 12));
+
+            let crouch = TextureAtlas::from_grid(asset_server.load("Knight/Colour1/Outline/120x80_PNGSheets/_Crouch.png"),
+            Vec2::new(120.0, 80.0),
+            1,
+            1,
+            None,
+            None
+            );
+            res.add(AnimationState::Crouch, texture_atlas.add(crouch), AnimationMeta::new(1, 12));
+
             let crouch_walk_atlas = TextureAtlas::from_grid(
                 asset_server.load("Knight/Colour1/Outline/120x80_PNGSheets/_CrouchWalk.png"),
                 Vec2::new(120.0, 80.0),
@@ -140,10 +162,11 @@ impl PhoxAnimationBundle {
 }
 
 fn animate_sprite(
-    mut animations: Query<(&mut TextureAtlasSprite, &AnimationMeta, &mut FrameTime)>,
-    time: Res<Time>
+    mut animations: Query<(&mut TextureAtlasSprite, &mut AnimationMeta, &mut FrameTime)>,
+    time: Res<Time>,
+    input: Res<Input<KeyCode>>,
 ) {
-    for (mut sprite, animation, mut frame_time) in animations.iter_mut() {
+    for (mut sprite, mut animation, mut frame_time) in animations.iter_mut() {
         let delt = time.delta_seconds();
         frame_time.0 += delt;
         if frame_time.0 > animation.frame_time {
@@ -153,6 +176,11 @@ fn animate_sprite(
                 sprite.index %= animation.len;
             }
             frame_time.0 -= animation.frame_time;
+        }
+        if input.pressed(KeyCode::S) {
+            animation.crouch_elapsed += delt;
+        } else {
+            animation.crouch_elapsed = 0.0;
         }
     }
 }
@@ -186,7 +214,7 @@ fn change_player_animation(
         ),
         (With<Player>, With<AnimationMeta>)
     >,
-    animations: Res<AnimationResource>
+    animations: Res<AnimationResource>,
 ) {
     // let mut frame_time = frame_time.single_mut();
     // let transition_complete = frame_time.0 >= animation.frame_time * (animation.len as f32);
@@ -208,10 +236,18 @@ fn change_player_animation(
         set = AnimationState::Jump
     } else if velocity.linvel.y < -0.01 {
         set =  AnimationState::Fall
-    } else if velocity.linvel.x != 0.0 {
+    }
+    else if input.pressed(KeyCode::S) && (input.pressed(KeyCode::D) || input.pressed(KeyCode::A)){
+        set = AnimationState::CrouchWalk;
+    }
+    else if input.just_pressed(KeyCode::S){
+        set = AnimationState::CrouchTransition;
+    } else if input.pressed(KeyCode::S){
+        set = AnimationState::Crouch;
+    }
+    else if velocity.linvel.x != 0.0 {
         set = AnimationState::Run
-    } else if input.pressed(KeyCode::S){set = AnimationState::CrouchWalk};
-
+    }
     println!("Current Animation State: {:?}", set);
 
     let Some((new_atlas, new_animation)) = animations.get(set) else {
@@ -224,4 +260,4 @@ fn change_player_animation(
 }
 
 
-// "assets/Knight/Colour1/Outline/120x80_PNGSheets/_CrouchTransition.png"
+//

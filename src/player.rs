@@ -17,7 +17,13 @@ pub fn player_movement(
 
         let left = if input.pressed(KeyCode::A) { 1.0 } else { 0.0 };
 
-        velocity.linvel.x = (right - left) * 200.0;
+        let mut speed_multiplier = 1.0;
+
+        if input.pressed(KeyCode::S){
+            speed_multiplier = 0.3;
+        }
+
+        velocity.linvel.x = (right - left) * 200.0 * speed_multiplier;
 
         if input.just_pressed(KeyCode::W) && ground_detection.on_ground {
             velocity.linvel.y = 500.0;
