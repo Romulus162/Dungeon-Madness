@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::time::Duration;
 
-use bevy::prelude::*;
+use bevy::{prelude::*, asset};
 use bevy_inspector_egui::egui::Key;
 use bevy_rapier2d::prelude::*;
 
@@ -28,6 +28,13 @@ enum AnimationState {
     CrouchTransition,
     Crouch,
     CrouchWalk,
+    Attack,
+    AttackSlide,
+    Attack2,
+    Attack2Slide,
+    CrouchAttack,
+    Combo,
+    ComboSlide,
 }
 
 #[derive(Debug, Clone, Component)]
@@ -108,7 +115,7 @@ impl FromWorld for AnimationResource {
                 None,
                 None
             );
-            res.add(AnimationState::Fall, texture_atlas.add(fall_atlas), AnimationMeta::new(2, 12));
+            res.add(AnimationState::Fall, texture_atlas.add(fall_atlas), AnimationMeta::new(2, 1));
 
             let crouch_transition_atlas = TextureAtlas::from_grid(asset_server.load("Knight/Colour1/Outline/120x80_PNGSheets/_CrouchTransition.png"),
                 Vec2::new(120.0, 80.0),
@@ -138,6 +145,37 @@ impl FromWorld for AnimationResource {
             );
             res.add(AnimationState::CrouchWalk, texture_atlas.add(crouch_walk_atlas),AnimationMeta::new(7, 12));
             //8
+
+            let attack = TextureAtlas::from_grid(
+            asset_server.load("Knight/Colour1/Outline/120x80_PNGSheets/_AttackNoMovement.png"),
+            Vec2::new(120.0, 80.0),
+            4,
+            1,
+            None,
+            None
+            );
+            res.add(AnimationState::Attack, texture_atlas.add(attack),AnimationMeta::new(3,12));
+
+
+            let attack2 = TextureAtlas::from_grid(
+                asset_server.load("Knight/Colour1/Outline/120x80_PNGSheets/_Attack2NoMovement.png"),
+                Vec2::new(120.0, 80.0),
+                6,
+                1,
+                None,
+                None
+            );
+            res.add(AnimationState::Attack2, texture_atlas.add(attack2), AnimationMeta::new(5, 12));
+
+            let combo = TextureAtlas::from_grid(
+                asset_server.load("Knight/Colour1/Outline/120x80_PNGSheets/_AttackComboNoMovement.png"),
+                Vec2::new(120.0, 80.0),
+                10,
+                1,
+                None,
+                None
+            );
+            res.add(AnimationState::Combo, texture_atlas.add(combo), AnimationMeta::new(9, 12));
         });
         res
     }
@@ -216,9 +254,6 @@ fn change_player_animation(
     >,
     animations: Res<AnimationResource>,
 ) {
-    // let mut frame_time = frame_time.single_mut();
-    // let transition_complete = frame_time.0 >= animation.frame_time * (animation.len as f32);
-
 
     if player.is_empty() {
         return;
@@ -248,6 +283,17 @@ fn change_player_animation(
     else if velocity.linvel.x != 0.0 {
         set = AnimationState::Run
     }
+    else if input.pressed(KeyCode::J) && input.pressed(KeyCode::K){
+        set = AnimationState::Combo;
+    }
+    else if input.pressed(KeyCode::J){
+        set = AnimationState::Attack
+    }
+    else if input.pressed(KeyCode::K){
+        set = AnimationState::Attack2;
+    }
+
+
     println!("Current Animation State: {:?}", set);
 
     let Some((new_atlas, new_animation)) = animations.get(set) else {
