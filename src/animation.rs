@@ -35,6 +35,10 @@ enum AnimationState {
     CrouchAttack,
     Combo,
     ComboSlide,
+    SlideStart,
+    Slide,
+    SlideEnd,
+    Roll,
 }
 
 #[derive(Debug, Clone, Component)]
@@ -154,7 +158,17 @@ impl FromWorld for AnimationResource {
             None,
             None
             );
-            res.add(AnimationState::Attack, texture_atlas.add(attack),AnimationMeta::new(3,12));
+            res.add(AnimationState::Attack, texture_atlas.add(attack),AnimationMeta::new(3,16));
+
+            let attack_slide = TextureAtlas::from_grid(
+                asset_server.load("Knight/Colour1/Outline/120x80_PNGSheets/_Attack.png"),
+            Vec2::new(120.0, 80.0),
+            4,
+            1,
+            None,
+            None
+            );
+            res.add(AnimationState::AttackSlide, texture_atlas.add(attack_slide), AnimationMeta::new(3, 16));
 
 
             let attack2 = TextureAtlas::from_grid(
@@ -165,7 +179,17 @@ impl FromWorld for AnimationResource {
                 None,
                 None
             );
-            res.add(AnimationState::Attack2, texture_atlas.add(attack2), AnimationMeta::new(5, 12));
+            res.add(AnimationState::Attack2, texture_atlas.add(attack2), AnimationMeta::new(5, 16));
+
+            let attack2_slide = TextureAtlas::from_grid(
+                asset_server.load("Knight/Colour1/Outline/120x80_PNGSheets/_Attack2.png"),
+                Vec2::new(120.0, 80.0),
+                6,
+                1,
+                None,
+                None
+            );
+            res.add(AnimationState::Attack2Slide, texture_atlas.add(attack2_slide), AnimationMeta::new(5, 16));
 
             let combo = TextureAtlas::from_grid(
                 asset_server.load("Knight/Colour1/Outline/120x80_PNGSheets/_AttackComboNoMovement.png"),
@@ -175,7 +199,39 @@ impl FromWorld for AnimationResource {
                 None,
                 None
             );
-            res.add(AnimationState::Combo, texture_atlas.add(combo), AnimationMeta::new(9, 12));
+            res.add(AnimationState::Combo, texture_atlas.add(combo), AnimationMeta::new(9, 16));
+
+            let combo_slide = TextureAtlas::from_grid(asset_server.load("Knight/Colour1/Outline/120x80_PNGSheets/_AttackCombo2hit.png"),
+            Vec2::new(120.0, 80.0),
+            10,
+            1,
+            None,
+            None);
+            res.add(AnimationState::ComboSlide, texture_atlas.add(combo_slide), AnimationMeta::new(9, 16));
+
+            let crouch_attack = TextureAtlas::from_grid(
+                asset_server.load("Knight/Colour1/Outline/120x80_PNGSheets/_CrouchAttack.png"),
+
+            Vec2::new(120.0, 80.0),
+            4,
+            1,
+            None,
+            None
+            );
+            res.add(AnimationState::CrouchAttack, texture_atlas.add(crouch_attack),
+             AnimationMeta::new(3, 16));
+
+            let roll = TextureAtlas::from_grid(asset_server.load("Knight/Colour1/Outline/120x80_PNGSheets/_Roll.png"),
+            Vec2::new(120.0, 80.0),
+            12,
+            1,
+            None,
+            None
+            );
+            res.add(AnimationState::Roll, texture_atlas.add(roll),
+            AnimationMeta::new(11, 12))
+
+
         });
         res
     }
@@ -272,6 +328,9 @@ fn change_player_animation(
     } else if velocity.linvel.y < -0.01 {
         set =  AnimationState::Fall
     }
+    else if input.pressed(KeyCode::S) && input.pressed(KeyCode::J){
+        set = AnimationState::CrouchAttack;
+    }
     else if input.pressed(KeyCode::S) && (input.pressed(KeyCode::D) || input.pressed(KeyCode::A)){
         set = AnimationState::CrouchWalk;
     }
@@ -280,14 +339,28 @@ fn change_player_animation(
     } else if input.pressed(KeyCode::S){
         set = AnimationState::Crouch;
     }
+    else if input.pressed(KeyCode::L){
+        set = AnimationState::Roll;
+    }
+
+
     else if velocity.linvel.x != 0.0 {
         set = AnimationState::Run
+    }
+    else if (input.pressed(KeyCode::D) || input.pressed(KeyCode::A)) && input.pressed(KeyCode::J) && input.pressed(KeyCode::K){
+        set = AnimationState::ComboSlide;
     }
     else if input.pressed(KeyCode::J) && input.pressed(KeyCode::K){
         set = AnimationState::Combo;
     }
+    else if (input.pressed(KeyCode::A) || input.pressed(KeyCode::D)) && input.pressed(KeyCode::J){
+        set = AnimationState::AttackSlide;
+    }
     else if input.pressed(KeyCode::J){
         set = AnimationState::Attack
+    }
+    else if (input.pressed(KeyCode::A) || input.pressed(KeyCode::D)) && input.pressed(KeyCode::K){
+        set = AnimationState::Attack2Slide;
     }
     else if input.pressed(KeyCode::K){
         set = AnimationState::Attack2;

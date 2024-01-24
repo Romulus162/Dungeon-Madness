@@ -19,14 +19,27 @@ pub fn player_movement(
 
         let mut speed_multiplier = 1.0;
 
-        if input.pressed(KeyCode::S){
+
+        if input.pressed(KeyCode::J) || input.pressed(KeyCode::K){
+            speed_multiplier = 0.0;
+        }
+        else if input.pressed(KeyCode::S){
             speed_multiplier = 0.3;
         }
 
+
         velocity.linvel.x = (right - left) * 200.0 * speed_multiplier;
+
+        if input.pressed(KeyCode::L){
+            velocity.linvel.x += 500.0;
+        }
+
 
         if input.just_pressed(KeyCode::W) && ground_detection.on_ground {
             velocity.linvel.y = 500.0;
         }
+
+
+
     }
 }
