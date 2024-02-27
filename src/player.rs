@@ -10,9 +10,9 @@ use bevy_rapier2d::prelude::*;
 
 pub fn player_movement(
     input: Res<Input<KeyCode>>,
-    mut query: Query<(&mut Velocity, &GroundDetection), With<Player>>
+    mut query: Query<(&mut Velocity, &GroundDetection, &mut TextureAtlasSprite), With<Player>>
 ) {
-    for (mut velocity, ground_detection) in &mut query {
+    for (mut velocity, ground_detection,sprite) in &mut query {
         let right = if input.pressed(KeyCode::D) { 1.0 } else { 0.0 };
 
         let left = if input.pressed(KeyCode::A) { 1.0 } else { 0.0 };
@@ -31,7 +31,14 @@ pub fn player_movement(
         velocity.linvel.x = (right - left) * 200.0 * speed_multiplier;
 
         if input.pressed(KeyCode::L){
-            velocity.linvel.x += 500.0;
+            // let dodge_direction = if velocity.linvel.x >= 0.0 { 1.0 } else { -1.0 };
+            // velocity.linvel.x += 500.0 * dodge_direction;
+            if sprite.flip_x {
+                velocity.linvel.x += 500.0;
+            } else {
+                velocity.linvel.x -= 500.0;
+            }
+
         }
 
 
