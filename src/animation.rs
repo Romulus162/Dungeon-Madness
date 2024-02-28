@@ -5,7 +5,7 @@ use bevy::{prelude::*, asset};
 use bevy_inspector_egui::egui::Key;
 use bevy_rapier2d::prelude::*;
 
-use crate::components::Player;
+use crate::components::{GroundDetection, Player};
 
 #[derive(Debug)]
 pub struct AnimationPlugin;
@@ -39,6 +39,7 @@ enum AnimationState {
     Slide,
     SlideEnd,
     Roll,
+    Dash
 }
 
 #[derive(Debug, Clone, Component)]
@@ -229,8 +230,18 @@ impl FromWorld for AnimationResource {
             None
             );
             res.add(AnimationState::Roll, texture_atlas.add(roll),
-            AnimationMeta::new(11, 12))
+            AnimationMeta::new(11, 12));
 
+            let dash = TextureAtlas::from_grid(asset_server.load("Knight/Colour1/Outline/120x80_PNGSheets/_Dash.png"),
+
+            Vec2::new(120.0, 80.0),
+            2,
+            1,
+            None,
+            None
+            );
+            res.add(AnimationState::Dash, texture_atlas.add(dash),
+            AnimationMeta::new(1,12))
 
         });
         res
@@ -305,16 +316,22 @@ fn change_player_animation(
             &mut AnimationMeta,
             &mut TextureAtlasSprite,
             &Velocity,
+            &GroundDetection
         ),
-        (With<Player>, With<AnimationMeta>)
+        (With<Player>, With<AnimationMeta>),
+
     >,
     animations: Res<AnimationResource>,
 ) {
 
+
     if player.is_empty() {
         return;
     }
-    let (_player, mut atlas, mut animation, mut sprite, velocity) = player.single_mut();
+    let (_player, mut atlas, mut animation, mut sprite, velocity, ground_detection) = player.single_mut();
+
+
+
     if velocity.linvel.x < -0.1 {
         sprite.flip_x = true;
     } else if velocity.linvel.x > 0.1 {
@@ -322,6 +339,7 @@ fn change_player_animation(
     }
 
     let mut set = AnimationState::Idle;
+
 
     if velocity.linvel.y > 0.01 {
         set = AnimationState::Jump
@@ -339,11 +357,12 @@ fn change_player_animation(
     } else if input.pressed(KeyCode::S){
         set = AnimationState::Crouch;
     }
+    else if input.pressed(KeyCode::L) && (!ground_detection.on_ground) {
+        set = AnimationState::Dash;
+    }
     else if input.pressed(KeyCode::L){
         set = AnimationState::Roll;
     }
-
-
     else if velocity.linvel.x != 0.0 {
         set = AnimationState::Run
     }
