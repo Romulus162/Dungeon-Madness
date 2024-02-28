@@ -6,6 +6,7 @@ use bevy::{ prelude::*, utils::HashMap };
 // window::PrimaryWindow };
 use bevy_rapier2d::prelude::{ Collider, RigidBody };
 use bevy_rapier2d::dynamics::GravityScale;
+use bevy_rapier2d::control::CharacterAutostep;
 
 use bevy_rapier2d::prelude::*;
 

@@ -39,7 +39,13 @@ enum AnimationState {
     Slide,
     SlideEnd,
     Roll,
-    Dash
+    Dash,
+    WallHang,
+    WallSlide,
+    WallClimb,
+    WallClimbNoMovement,
+    Death,
+    DeathNoMovement,
 }
 
 #[derive(Debug, Clone, Component)]
@@ -253,7 +259,54 @@ impl FromWorld for AnimationResource {
             res.add(AnimationState::Slide, texture_atlas.add(slide),
         AnimationMeta::new(3,6));
 
+            let slide_start = TextureAtlas::from_grid(asset_server.load("Knight/Colour1/Outline/120x80_PNGSheets/_SlideTransitionStart.png"),
+            Vec2::new(120.0, 80.0),
+            1,
+            1,
+            None,
+            None);
+            res.add(AnimationState::SlideStart, texture_atlas.add(slide_start), AnimationMeta::new(1, 12));
+
+            let slide_end = TextureAtlas::from_grid(
+                asset_server.load("Knight/Colour1/Outline/120x80_PNGSheets/_SlideTransitionEnd.png"),
+                Vec2::new(120.0, 80.0),
+                1,
+                1,
+                None,
+                None
+            );
+            res.add(AnimationState::SlideEnd, texture_atlas.add(slide_end), AnimationMeta::new(1, 12));
+
+            let wall_hang = TextureAtlas::from_grid(
+                asset_server.load("Knight/Colour1/Outline/120x80_PNGSheets/_WallHang.png"),
+                Vec2::new(120.0, 80.0),
+                1,
+                1,
+                None,
+                None
+            );
+            res.add(AnimationState::WallHang, texture_atlas.add(wall_hang),
+        AnimationMeta::new(1, 12));
+
+            let wall_climb = TextureAtlas::from_grid(asset_server.load("Knight/Colour1/Outline/120x80_PNGSheets/_WallClimb.png"),
+            Vec2::new(120.0, 80.0),
+        7,
+        1,
+        None,
+        None);
+        res.add(AnimationState::WallClimb, texture_atlas.add(wall_climb),
+            AnimationMeta::new(6, 12));
+
+            let death = TextureAtlas::from_grid(asset_server.load("Knight/Colour1/Outline/120x80_PNGSheets/_Death.png"),
+            Vec2::new(120.0, 80.0),
+        10,
+        1,
+        None,
+        None);
+        res.add(AnimationState::Death, texture_atlas.add(death),
+    AnimationMeta::new(9,12));
         });
+
         res
     }
 }
@@ -317,6 +370,8 @@ fn append_animation_for_player(
     commands.entity(entity).insert(PhoxAnimationBundle::new(animation));
 }
 
+fn detect_wall() {}
+
 fn change_player_animation(
     input: Res<Input<KeyCode>>,
     mut player: Query<
@@ -350,6 +405,7 @@ fn change_player_animation(
 
     let mut set = AnimationState::Idle;
 
+    let mut isSliding = false;
 
     if velocity.linvel.y > 0.01 {
         set = AnimationState::Jump
@@ -370,9 +426,37 @@ fn change_player_animation(
     else if input.pressed(KeyCode::L) && (!ground_detection.on_ground) {
         set = AnimationState::Dash;
     }
+
+    /////////////////////////////
+
+    //somewhere in this block, I need to add the slide start and slide end animations.
+
+    // This overall code block is a mess and needs refactoring and further improvements
+
     else if input.pressed(KeyCode::L) && (input.pressed(KeyCode::A) || input.pressed(KeyCode::D) ){
-        set = AnimationState::Slide;
+        isSliding = true;
+        if isSliding {
+            set = AnimationState::SlideStart;
+            isSliding = true;
+            if isSliding {
+                set = AnimationState::Slide;
+            } else {
+                isSliding = false;
+                set = AnimationState::SlideEnd;
+            }
+        }
+        // set = AnimationState::SlideStart;
+        // set = AnimationState::Slide;
+        // set = AnimationState::SlideEnd;
     }
+//////////////////////////////////////////
+
+
+// let mut isSliding = false;
+// let mut startSliding = false;
+// let mut endSlide = false;
+
+
     else if input.pressed(KeyCode::L){
         set = AnimationState::Roll;
     }
@@ -396,6 +480,9 @@ fn change_player_animation(
     }
     else if input.pressed(KeyCode::K){
         set = AnimationState::Attack2;
+    }
+    else if input.pressed(KeyCode::I) {
+        set = AnimationState::Death
     }
 
 
