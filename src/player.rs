@@ -33,7 +33,7 @@ pub fn player_movement(
         if input.pressed(KeyCode::L) && (!ground_detection.on_ground) {
             *gravity = GravityScale(0.0);
             let dodge_direction = if velocity.linvel.x >= 0.0 { 1.0 } else { -1.0 };
-            velocity.linvel.x += 500.0 * dodge_direction;
+            velocity.linvel.x += 200.0 * dodge_direction;
             velocity.linvel.y = 0.0;
         } else {
             *gravity = GravityScale(1.0);
@@ -43,7 +43,7 @@ pub fn player_movement(
 
         if input.pressed(KeyCode::L){
             let dodge_direction = if velocity.linvel.x >= 0.0 { 1.0 } else { -1.0 };
-            velocity.linvel.x += 500.0 * dodge_direction;
+            velocity.linvel.x += 200.0 * dodge_direction;
         }
 
 

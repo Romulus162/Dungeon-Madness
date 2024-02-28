@@ -241,7 +241,17 @@ impl FromWorld for AnimationResource {
             None
             );
             res.add(AnimationState::Dash, texture_atlas.add(dash),
-            AnimationMeta::new(1,12))
+            AnimationMeta::new(1,12));
+
+            let slide = TextureAtlas::from_grid(asset_server.load("Knight/Colour1/Outline/120x80_PNGSheets/_SlideFull.png"),
+        Vec2::new(120.0, 80.0),
+            4,
+            1,
+            None,
+            None
+            );
+            res.add(AnimationState::Slide, texture_atlas.add(slide),
+        AnimationMeta::new(3,6));
 
         });
         res
@@ -359,6 +369,9 @@ fn change_player_animation(
     }
     else if input.pressed(KeyCode::L) && (!ground_detection.on_ground) {
         set = AnimationState::Dash;
+    }
+    else if input.pressed(KeyCode::L) && (input.pressed(KeyCode::A) || input.pressed(KeyCode::D) ){
+        set = AnimationState::Slide;
     }
     else if input.pressed(KeyCode::L){
         set = AnimationState::Roll;
